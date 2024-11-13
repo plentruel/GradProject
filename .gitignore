@@ -1,0 +1,12 @@
+# Mac specific
+.DS_Store
+
+# Python cache files
+__pycache__/
+
+# Python virtual environment
+bin/
+lib/
+include/
+pyvenv.cfg
+share/
