@@ -2,14 +2,18 @@ import os
 import secrets
 from flaskWebSite import app
 import numpy as np
+from pathlib import Path
 
 def save_picture(form_picture, wheretosave):
     randomhex = secrets.token_hex(8)
     picture_fn = randomhex + '.png'  # Assuming the image is being saved as PNG
-    path = os.path.join(app.root_path, wheretosave, picture_fn)
+    path = Path(app.root_path) / wheretosave / picture_fn
     
+    # Ensure the directory exists
+    path.parent.mkdir(parents=True, exist_ok=True)
+
     # Save the image file
-    form_picture.save(path)
+    form_picture.save(str(path))  # Convert Path to string for compatibility
     
     return picture_fn
 
@@ -72,8 +76,9 @@ loaded_model_2 = FashionMNISTModelV2(input_shape=3,
                                     hidden_units=10,
                                     output_shape=20)
 
- # Load in the saved state_dict()
-loaded_model_2.load_state_dict(torch.load(f="project_env/flaskWebSite/models/03_pytorch_computer_vision_model_2.pth", weights_only=True))
+# Load in the saved state_dict()
+model_path = Path("project_env/flaskWebSite/models/03_pytorch_computer_vision_model_2.pth")
+loaded_model_2.load_state_dict(torch.load(str(model_path), weights_only=True))
 
 # Send model to GPU
 loaded_model_2 = loaded_model_2.to(device)
@@ -131,10 +136,8 @@ modelHV = VGGUNET19()
 
 
 # Load the entire checkpoint
-checkpoint = torch.load(
-    "/Users/salmantas/Desktop/Py_Enviroments/vgg19_env/Heritage-Vision/VGGUnet19_Segmentation_best.pth.tar",
-    map_location=torch.device('cpu')
-)
+vgg_model_path = Path("/Users/salmantas/Desktop/Py_Enviroments/vgg19_env/Heritage-Vision/VGGUnet19_Segmentation_best.pth.tar")
+checkpoint = torch.load(str(vgg_model_path), map_location=torch.device('cpu'))
 
 # Extract only the model's state_dict
 model_state_dict = checkpoint["model_state_dict"]
@@ -188,6 +191,3 @@ def generate(image_path, model=modelHV, device : torch.device = device):
     saved_image_path = save_picture(output_image_pil, 'static/outputimgs')
     
     return saved_image_path
-
-
-
